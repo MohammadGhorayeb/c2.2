@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <link rel="stylesheet" href="/frontend/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sentiment Analysis</h1>
+            <p>Enter text to analyze its sentiment</p>
+        </header>
+        
+        <main>
+            <div class="input-section">
+                <textarea id="textInput" placeholder="Type your text here..."></textarea>
+                <button id="analyzeBtn">Analyze Sentiment</button>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-card">
+                    <h2>Analysis Result</h2>
+                    <div class="result-content">
+                        <p class="sentiment-label">Sentiment: <span id="sentiment">-</span></p>
+                        <p class="confidence-label">Confidence: <span id="confidence">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('Please enter some text to analyze');
+                return;
+            }
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Analysis failed');
+                }
+
+                const data = await response.json();
+                document.getElementById('sentiment').textContent = data.sentiment;
+                document.getElementById('confidence').textContent = `${(data.score * 100).toFixed(2)}%`;
+                document.getElementById('resultSection').style.display = 'block';
+            } catch (error) {
+                alert('Error analyzing text. Please try again.');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html> 
